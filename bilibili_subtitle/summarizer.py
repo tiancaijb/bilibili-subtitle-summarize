@@ -1,6 +1,5 @@
-"""AI 总结模块 —— DeepSeek 分段总结 + 合并。"""
+"""AI 总结模块 —— 支持多种 LLM 的通用总结引擎。"""
 
-import json
 import os
 import re
 import sys
@@ -11,52 +10,13 @@ import requests
 CHUNK_SIZE = 6000
 
 
-def get_api_key(model: str) -> str:
-    """获取 LLM API key。
-    
-    优先级：
-    1. 命令行 --key 参数（已通过 api_key 传入）
-    2. 环境变量 LLM_API_KEY 或 DEEPSEEK_KEY
-    3. n8n 数据库中已配置的 DeepSeek key（仅 model 含 deepseek 时）
-    """
-    key = os.environ.get("LLM_API_KEY") or os.environ.get("DEEPSEEK_KEY", "")
+def get_api_key() -> str:
+    """获取 LLM API key（环境变量 LLM_API_KEY）。"""
+    key = os.environ.get("LLM_API_KEY", "")
     if key:
         return key
-
-    # 从 n8n 数据库解密
-    try:
-        import sqlite3, base64, hashlib
-        from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-
-        config_path = Path.home() / ".n8n/config"
-        if config_path.exists():
-            with open(config_path) as f:
-                cfg = json.load(f)
-            key_bytes = cfg.get("encryptionKey", "").encode()
-            conn = sqlite3.connect(str(Path.home() / ".n8n/database.sqlite"))
-            cursor = conn.execute(
-                "SELECT data FROM credentials_entity WHERE type = 'deepSeekApi' LIMIT 1"
-            )
-            row = cursor.fetchone()
-            conn.close()
-            if row:
-                enc = base64.b64decode(row[0])
-                salt, ct = enc[8:16], enc[16:]
-                dk = b""
-                while len(dk) < 48:
-                    dk += hashlib.md5(
-                        dk[-16:] + key_bytes + salt if dk else key_bytes + salt
-                    ).digest()
-                cipher = Cipher(algorithms.AES(dk[:32]), modes.CBC(dk[32:48]))
-                decryptor = cipher.decryptor()
-                plain = decryptor.update(ct) + decryptor.finalize()
-                plain = plain[:-plain[-1]]
-                return json.loads(plain)["apiKey"]
-    except Exception:
-        pass
-
     raise RuntimeError(
-        "未找到 DeepSeek API key。设置 DEEPSEEK_KEY 环境变量或创建 ~/.deepseek_key 文件。"
+        "未找到 LLM API key。请设置环境变量 LLM_API_KEY 或通过 --key 参数传入。"
     )
 
 
@@ -134,7 +94,7 @@ def summarize(subtitle_data: dict, api_key: str = "", model: str = "deepseek-cha
       - 本地 Ollama: model="llama3", api_base="http://localhost:11434/v1"
     """
     if not api_key:
-        api_key = get_deepseek_key()
+        api_key = get_api_key()
 
     title = subtitle_data["title"]
     text = _format_subtitle_text(subtitle_data)
