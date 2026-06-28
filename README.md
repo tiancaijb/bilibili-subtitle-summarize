@@ -9,7 +9,7 @@ git clone https://github.com/tiancaijb/bilibili-subtitle-summarize.git
 cd bilibili-subtitle-summarize
 pip install -r requirements.txt
 python3 -m playwright install chromium   # WSL2/Linux
-py -m playwright install chromium         # Windows
+python -m playwright install chromium      # Windows
 ```
 
 ## 设置 DeepSeek API Key
@@ -29,7 +29,6 @@ echo "sk-xxx" > ~/.deepseek_key
 ```bash
 python3 bili_summarize.py BV1ooDyBmE6v          # WSL2/Linux
 python bili_summarize.py BV1ooDyBmE6v           # Windows
-py bili_summarize.py BV1ooDyBmE6v               # Windows (备选)
 
 python3 bili_summarize.py BV1ooDyBmE6v -f org   # Org-mode
 python3 bili_summarize.py BV1ooDyBmE6v -f html   # HTML  
