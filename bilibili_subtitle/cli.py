@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 from .downloader import download_subtitle
-from .summarizer import summarize, get_deepseek_key
+from .summarizer import summarize
 
 
 def main():

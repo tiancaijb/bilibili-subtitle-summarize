@@ -8,17 +8,20 @@ from pathlib import Path
 
 import requests
 
-DEEPSEEK_KEY_FILE = Path.home() / ".deepseek_key"
 CHUNK_SIZE = 6000
 
 
-def get_deepseek_key() -> str:
-    """获取 DeepSeek API key（环境变量 > 文件 > n8n 数据库）"""
-    key = os.environ.get("DEEPSEEK_KEY", "")
+def get_api_key(model: str) -> str:
+    """获取 LLM API key。
+    
+    优先级：
+    1. 命令行 --key 参数（已通过 api_key 传入）
+    2. 环境变量 LLM_API_KEY 或 DEEPSEEK_KEY
+    3. n8n 数据库中已配置的 DeepSeek key（仅 model 含 deepseek 时）
+    """
+    key = os.environ.get("LLM_API_KEY") or os.environ.get("DEEPSEEK_KEY", "")
     if key:
         return key
-    if DEEPSEEK_KEY_FILE.exists():
-        return DEEPSEEK_KEY_FILE.read_text().strip()
 
     # 从 n8n 数据库解密
     try:
