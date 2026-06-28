@@ -9,17 +9,26 @@ pip install bilibili-subtitle-summarize
 python -m playwright install chromium
 ```
 
-## 设置 DeepSeek API Key
+## 设置 API Key
 
 二选一：
 
 ```bash
-# 方式1：环境变量
-export DEEPSEEK_KEY=sk-xxx
+# 方式1：环境变量（推荐，通用）
+export DEEPSEEK_KEY=sk-xxx              # WSL2/Linux/macOS
+set DEEPSEEK_KEY=sk-xxx                # Windows cmd
+$env:DEEPSEEK_KEY="sk-xxx"            # Windows PowerShell
 
-# 方式2：文件
-echo "sk-xxx" > ~/.deepseek_key
+# 方式2：bili-summarize --key 参数
+bili-summarize BV1ooDyBmE6v --key sk-xxx
 ```
+
+DeepSeek key 也可存放在用户目录的 `.deepseek_key` 文件中（纯文本，一行 key）：
+
+| 系统 | 路径 |
+|------|------|
+| WSL2/Linux/macOS | `~/.deepseek_key` |
+| Windows | `%USERPROFILE%\.deepseek_key` |
 
 ## 用法
 
