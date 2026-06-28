@@ -1,0 +1,2 @@
+[console_scripts]
+bili-summarize = bilibili_subtitle.cli:main

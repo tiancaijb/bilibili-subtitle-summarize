@@ -5,11 +5,8 @@
 ## 安装
 
 ```bash
-git clone https://github.com/tiancaijb/bilibili-subtitle-summarize.git
-cd bilibili-subtitle-summarize
-pip install -r requirements.txt
-python3 -m playwright install chromium   # WSL2/Linux
-python -m playwright install chromium      # Windows
+pip install bilibili-subtitle-summarize
+python -m playwright install chromium
 ```
 
 ## 设置 DeepSeek API Key
@@ -27,16 +24,12 @@ echo "sk-xxx" > ~/.deepseek_key
 ## 用法
 
 ```bash
-python3 bili_summarize.py BV1ooDyBmE6v          # WSL2/Linux
-python bili_summarize.py BV1ooDyBmE6v           # Windows
-
-python3 bili_summarize.py BV1ooDyBmE6v -f org   # Org-mode
-python3 bili_summarize.py BV1ooDyBmE6v -f html   # HTML  
-python3 bili_summarize.py BV1ooDyBmE6v --login    # 强制重新扫码登录
-python3 bili_summarize.py BV1ooDyBmE6v --no-summarize  # 只下载字幕
+bili-summarize BV1ooDyBmE6v                # 下载 + AI 总结，输出 Markdown
+bili-summarize BV1ooDyBmE6v -f org         # 输出 Org-mode
+bili-summarize BV1ooDyBmE6v -f html        # 输出精美 HTML
+bili-summarize BV1ooDyBmE6v --login         # 强制重新扫码登录
+bili-summarize BV1ooDyBmE6v --no-summarize  # 只下载字幕，不总结
 ```
-
-Windows 上把 `python3` 换成 `python` 或 `py`。
 ```
 
 首次使用会弹出二维码，用 Bilibili App 扫码登录。Cookie 缓存 24 小时。
