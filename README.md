@@ -24,12 +24,21 @@ echo "sk-xxx" > ~/.deepseek_key
 ## 用法
 
 ```bash
-bili-summarize BV1ooDyBmE6v                # 下载 + AI 总结，输出 Markdown
-bili-summarize BV1ooDyBmE6v -f org         # 输出 Org-mode
-bili-summarize BV1ooDyBmE6v -f html        # 输出精美 HTML
-bili-summarize BV1ooDyBmE6v --login         # 强制重新扫码登录
-bili-summarize BV1ooDyBmE6v --no-summarize  # 只下载字幕，不总结
+# 默认 DeepSeek
+bili-summarize BV1ooDyBmE6v
+
+# 指定模型和 API
+bili-summarize BV1ooDyBmE6v --model gpt-4o --api-base https://api.openai.com/v1 --key sk-xxx
+bili-summarize BV1ooDyBmE6v --model llama3 --api-base http://localhost:11434/v1
+
+# 格式选项
+bili-summarize BV1ooDyBmE6v -f org
+bili-summarize BV1ooDyBmE6v -f html
+bili-summarize BV1ooDyBmE6v --login
+bili-summarize BV1ooDyBmE6v --no-summarize
 ```
+
+DeepSeek 的 API Key 会自动从 `~/.deepseek_key` 或 n8n 数据库读取，无需每次指定。其他模型的 key 用 `--key` 传入。
 ```
 
 首次使用会弹出二维码，用 Bilibili App 扫码登录。Cookie 缓存 24 小时。

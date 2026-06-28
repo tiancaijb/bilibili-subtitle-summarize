@@ -103,15 +103,16 @@ def _chunk_text(text: str, max_chars: int = CHUNK_SIZE) -> list:
     return chunks
 
 
-def _call_deepseek(prompt: str, api_key: str, max_tokens: int = 4096) -> str:
+def _call_llm(prompt: str, model: str, api_key: str, api_base: str, max_tokens: int = 4096) -> str:
+    """调用 OpenAI 兼容 API（DeepSeek、OpenAI、Ollama 等通用）"""
     resp = requests.post(
-        "https://api.deepseek.com/v1/chat/completions",
+        f"{api_base}/chat/completions",
         headers={
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
         },
         json={
-            "model": "deepseek-chat",
+            "model": model,
             "messages": [{"role": "user", "content": prompt}],
             "temperature": 0.3,
             "max_tokens": max_tokens,
@@ -122,8 +123,13 @@ def _call_deepseek(prompt: str, api_key: str, max_tokens: int = 4096) -> str:
     return resp.json()["choices"][0]["message"]["content"]
 
 
-def summarize(subtitle_data: dict, api_key: str = "") -> str:
-    """总结字幕内容，返回 Markdown。"""
+def summarize(subtitle_data: dict, api_key: str = "", model: str = "deepseek-chat", api_base: str = "https://api.deepseek.com/v1") -> str:
+    """总结字幕内容，返回 Markdown。
+
+    默认使用 DeepSeek。指定 model 和 api_base 可切换模型：
+      - OpenAI:     model="gpt-4o", api_base="https://api.openai.com/v1"
+      - 本地 Ollama: model="llama3", api_base="http://localhost:11434/v1"
+    """
     if not api_key:
         api_key = get_deepseek_key()
 
@@ -145,7 +151,7 @@ def summarize(subtitle_data: dict, api_key: str = "") -> str:
 - 提取核心观点和可操作要点
 - 直接用中文输出，不要解释、不要寒暄"""
         print(f"  🤖 总结第 {i+1}/{len(chunks)} 部分...", file=sys.stderr)
-        summaries.append(_call_deepseek(prompt, api_key))
+        summaries.append(_call_llm(prompt, model, api_key, api_base))
 
     if len(summaries) == 1:
         return summaries[0]
@@ -166,7 +172,7 @@ def summarize(subtitle_data: dict, api_key: str = "") -> str:
 - 输出完整的结构化笔记（Markdown 格式）
 - 直接用中文输出"""
     print(f"  🔗 合并 {len(summaries)} 段总结...", file=sys.stderr)
-    return _call_deepseek(prompt, api_key, max_tokens=4096)
+    return _call_llm(prompt, model, api_key, api_base, max_tokens=4096)
 
 
 def _to_org(md: str, title: str) -> str:

@@ -22,7 +22,11 @@ def main():
     parser.add_argument("-o", "--output", type=str, default="",
                         help="输出文件路径")
     parser.add_argument("--key", type=str, default="",
-                        help="DeepSeek API Key")
+                        help="API Key")
+    parser.add_argument("--model", type=str, default="deepseek-chat",
+                        help="模型名 (默认: deepseek-chat, 也支持 gpt-4o, claude-3-opus 等)")
+    parser.add_argument("--api-base", type=str, default="https://api.deepseek.com/v1",
+                        help="API 地址 (默认: DeepSeek, 可设为 https://api.openai.com/v1 等)")
     args = parser.parse_args()
 
     # 提取 BV 号
@@ -42,13 +46,9 @@ def main():
         print("⏹ 跳过总结（--no-summarize）", file=sys.stderr)
         return
 
-    # 2. 设置 API Key
-    if args.key:
-        os.environ["DEEPSEEK_KEY"] = args.key
-
-    # 3. AI 总结
+    # 2. AI 总结
     print(f"\n🤖 开始 AI 总结...", file=sys.stderr)
-    markdown = summarize(subtitle_data)
+    markdown = summarize(subtitle_data, api_key=args.key, model=args.model, api_base=args.api_base)
 
     # 4. 格式化输出
     from .summarizer import format_output
